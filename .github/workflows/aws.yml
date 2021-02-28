@@ -1,9 +1,18 @@
+name: Deploy to Amazon ECS
+
 on:
   push:
     branches:
       - master
 
-name: Deploy to Amazon ECS
+env:
+  AWS_REGION: us-east-1                   
+  ECR_REPOSITORY: demo1          
+  ECS_SERVICE: demo1         
+  ECS_CLUSTER: demo-1
+  ECS_TASK_DEFINITION: .aws/task-definition.json
+  CONTAINER_NAME: 736616857275.dkr.ecr.us-east-1.amazonaws.com/demo1:latest
+                                               
 
 jobs:
   deploy:
@@ -26,8 +35,7 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-        aws-region: us-east-2
+        aws-region: us-east-1
 
     - name: Login to Amazon ECR
       id: login-ecr
@@ -37,7 +45,6 @@ jobs:
       id: build-image
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: dcdojo-amine
         IMAGE_TAG: ${{ github.sha }}
       run: |
         # Build a docker container and
@@ -51,14 +58,14 @@ jobs:
       id: task-def
       uses: aws-actions/amazon-ecs-render-task-definition@v1
       with:
-        task-definition: task-definition.json
-        container-name: dcdojo-container
+        task-definition: ${{ env.ECS_TASK_DEFINITION }}
+        container-name: ${{ env.CONTAINER_NAME }}
         image: ${{ steps.build-image.outputs.image }}
 
     - name: Deploy Amazon ECS task definition
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
       with:
         task-definition: ${{ steps.task-def.outputs.task-definition }}
-        service: dc-dojo-service-github
-        cluster: dcdojo-cluster
+        service: ${{ env.ECS_SERVICE }}
+        cluster: ${{ env.ECS_CLUSTER }}
         wait-for-service-stability: true
