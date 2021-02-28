@@ -1,9 +1,9 @@
-name: Deploy to Amazon ECS
-
 on:
   push:
     branches:
       - master
+
+name: Deploy to Amazon ECS-Fargate
 
 env:
   AWS_REGION: us-east-1                   
@@ -11,7 +11,7 @@ env:
   ECS_SERVICE: demo1         
   ECS_CLUSTER: demo-1
   ECS_TASK_DEFINITION: .aws/task-definition.json
-  CONTAINER_NAME: 736616857275.dkr.ecr.us-east-1.amazonaws.com/demo1:latest
+  CONTAINER_NAME: demo1
                                                
 
 jobs:
