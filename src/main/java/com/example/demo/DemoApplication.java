@@ -17,7 +17,7 @@ public class DemoApplication {
 
     @GetMapping("/")
     public String hello(@RequestParam(value = "version", defaultValue = "V12") String version) {
-        return String.format("Version: %s", version);
+        return String.format("Ben's Version: %s", version);
     }
 }
             
