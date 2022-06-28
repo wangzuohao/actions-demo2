@@ -7,7 +7,7 @@ name: Deploy to Amazon ECS-Fargate
                                                
 permissions:
   id-token: write
- #contents: read # This is required for actions/checkout@v2
+  contents: read # This is required for actions/checkout@v2
   
 jobs:
   deploy:
@@ -19,6 +19,6 @@ jobs:
       uses: aws-actions/configure-aws-credentials@v1
       with:
         aws-region: cn-northwest-1
-        role-to-assume: arn:aws-cn:iam::018986110898:role/OpenIDConnect2
+        role-to-assume: arn:aws-cn:iam::018986110898:role/oidc-Role-26PJF6G3R69O
      #   role-session-name: MySessionName
    
