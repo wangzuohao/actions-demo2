@@ -1,24 +1,40 @@
-on:
-  push:
-    branches:
-      - main
+# This is a basic workflow to help you get started with Actions
 
-name: Deploy to Amazon ECS-Fargate
-                                               
-permissions:
-  id-token: write
-  contents: read # This is required for actions/checkout@v2
-  
+name: test-aws-oidc
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "master" branch
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+
+
+# Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   deploy:
-    name: Deploy
+    name: Upload to Amazon S3
     runs-on: ubuntu-latest
+    # These permissions are needed to interact with GitHub's OIDC Token endpoint.
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
 
-    steps:     
-    - name: Configure AWS Credentials
+    - name: Configure AWS credentials from Test account
       uses: aws-actions/configure-aws-credentials@v1
       with:
+        role-to-assume: arn:aws-cn:iam::018986110898:role/my-github-actions-role-test
+       # role-to-assume: arn:aws-cn:iam::018986110898:role/github-read
         aws-region: cn-northwest-1
-        role-to-assume: arn:aws-cn:iam::018986110898:role/oidc-Role-26PJF6G3R69O
-     #   role-session-name: MySessionName
-   
+
+    - name: Copy files to the test website with the AWS CLI
+      run: |
+        aws s3 sync . s3://oidc
